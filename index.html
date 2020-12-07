@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatting App</title>
+    <script src="/socket.io/socket.io.js"></script>
+
+</head>
+
+<body style=" background-image: linear-gradient(rgb(255,255,255),rgb(0, 98, 128));">
+    <nav>
+        <img src="" class="logo" style=" display: block;  margin: auto;width: 50px;height: s0px;">
+    </nav>
+
+</body>
+<script>
+    var socket = io();
+
+
+    //New user try to join
+    const name = prompt('Please! Enter your name to join');
+    socket.emit('setUsername', name);
+    //When User name is empty
+    socket.on('nullUser', function (data) {
+        let newName = prompt(data);
+        socket.emit('setUsername', newName);
+
+    });
+    //Existed User try to join
+    socket.on('userExists', function (data) {
+        let newName = prompt(data);
+        socket.emit('setUsername', newName);
+
+    });
+
+
+    //Brodecast new user connection msg
+    socket.on('ConnMSG', function (data) {
+        document.getElementById('container').innerHTML += `<br><div style="text-align: center;s">${data}</div><br>`;
+    });
+
+
+    //Appinding Chat Body
+    socket.on('userSet', function (data) {
+        user = data.username;
+        document.body.innerHTML = `<div id="container" style=" max-width: 955px; border: 2px solid black; margin: auto; height: 60vh; padding: 33px; overflow-y: auto; margin-bottom: 23px;">
+            </div>
+            <div class="send">
+              <input type="text" id="messageInp"style="width: 92%;border: 2px solid black;border-radius: 6px;height: 34px;">
+              <button class="btn" type="button" onclick = "sendMessage()" style="cursor: pointer;border: 2px solid black;border-radius: 6px;height: 34px;">send</button>
+                
+            </div>`;
+    });
+    // Send Button Function
+    function sendMessage() {
+        var msg = document.getElementById('messageInp').value;
+        //Empty Message field
+        document.getElementById('messageInp').value = '';
+
+        if (msg) {
+            //Sending new MSG to self
+            document.getElementById('container').innerHTML += `<div style="word-wrap:break-word; float: right; width: 30%; clear: both; background-color: cornsilk; padding: 10px; margin: 17px 12px; border: 2px solid black; border-radius: 10px;">
+           <b>You:</b>${msg}</div>`
+            //Emitting new MSG for all
+            socket.emit('msg', { message: msg, user: user });
+        }
+    }
+    //Sending new message to all connation except sender
+    socket.on('newmsg', function (data) {
+        if (user) {
+            document.getElementById('container').innerHTML += `<div style="word-wrap:break-word; float: left; width: 30%; clear: both; background-color: cornsilk; padding: 10px; margin: 17px 12px; border: 2px solid black; border-radius: 10px;">
+              <b>${data.user}:</b>${data.message}</div>`;
+        }
+    })
+
+
+
+</script>
+
+</html>
