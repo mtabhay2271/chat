@@ -48,11 +48,16 @@
         document.body.innerHTML = `<div id="container" style=" max-width: 955px; border: 2px solid black; margin: auto; height: 60vh; padding: 33px; overflow-y: auto; margin-bottom: 23px;">
             </div>
             <div class="send">
-              <input type="text" id="messageInp"style="width: 92%;border: 2px solid black;border-radius: 6px;height: 34px;">
+              <input type="text" id="messageInp"style="width: 92%;border: 2px solid black;border-radius: 6px;height: 34px;" onkeydown="sendMessageOnEnter(event)">
               <button class="btn" type="button" onclick = "sendMessage()" style="cursor: pointer;border: 2px solid black;border-radius: 6px;height: 34px;">send</button>
                 
             </div>`;
     });
+    function sendMessageOnEnter(event) {
+      if (event.keyCode === 13) { // 13 is the Enter key's keycode
+         sendMessage();
+      }
+   }
     // Send Button Function
     function sendMessage() {
         var msg = document.getElementById('messageInp').value;
